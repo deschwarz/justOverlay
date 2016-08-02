@@ -15,12 +15,46 @@
     left: 0;
 }
 
-/*styles layer*/
-.layer-wrapper .layer-content {
-    margin: 0;
+/*Basic Styling layer*/
+.layer-wrapper .layer-index {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #fff
+    background: #fff;
+    max-width: 50%;
+    max-height: 50%;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.5);
 }
+
+.layer-wrapper .layer-index.layer-scrolling {
+    height: 100%;
+}
+
+.layer-wrapper .layer-content {
+    overflow: auto;
+    height: 100%;
+}
+
+.layer-wrapper .layer-content .layer-origin {
+    padding: 15px;
+}
+
+.layer-wrapper .layer-close {
+    position: absolute;
+    right: 0;
+    top: -1.75em;
+    background: #fff;
+    font-family: monospace;
+    padding: 0 0.5em;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.5em;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;      
+}
+
