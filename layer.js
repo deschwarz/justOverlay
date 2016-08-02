@@ -22,28 +22,31 @@ $(function() {
                 contentOrigin: globalName + '-origin',
                 closeElement: globalName + '-close',
                 closeElementText: 'X',
-                isScrolling: globalName + '-scrolling'
+                isScrolling: globalName + '-scrolling',
+                dataAttrName: 'data-' + globalName,
+                customOptions: globalName + '-custom'
+
             };
 
-            var options = {
+            var defaultOptions = {
 
                 styleClass: '',
                 close: 'button', //button, overlay
                 
-                customStyle: {
-                    padding: '',
-                    backgroundOverlay: '',
-                    border: ''
-                }
+                //Style
+                padding: '15',
+                backgroundOverlay: '',
+                border_width: ''
             };
 
             /**
              * 
              */
             var init = function() {
-                buildElement(); 
+                buildElement();
                 openLayer();
                 closeLayer();
+                
             };
 
             /**
@@ -74,20 +77,21 @@ $(function() {
              * 
              */
             var openLayer = function() {
-                $('body').find('*[data-' + globalName +']').on('click', function(e) {
+                $('body').find('*[' + config.dataAttrName +']').on('click', function(e) {
                     e.preventDefault();
                     var sDataId = $(this).data(globalName), // get layer id
                         sDataIdSelektor = '#' + sDataId,
-                        sIdentifyClass = globalName + '-' + sDataId; // flag opened Layer (get class from layer id)
+                        sIdentifyClass = globalName + '-' + sDataId, // flag opened Layer (get class from layer id)
+                        sInnerHtml = ''
                         
                     //check layer has opened before
                     if (!$('.' + config.wrapperClass).hasClass(sIdentifyClass)) {
                         
-                    var sInnerHtml =   '<div class=' + config.contentClass + '>'
-                                    +   '<div class=' + config.contentOrigin + '>' 
-                                    +      $(sDataIdSelektor).html()
-                                    +   '</div>' 
-                                    + '</div>'
+                    sInnerHtml  =   '<div class=' + config.contentClass + '>'
+                                +       '<div class=' + config.contentOrigin + '>' 
+                                +       $(sDataIdSelektor).html()
+                                +       '</div>' 
+                                +   '</div>'
 
                         //wrap users layer-content into divs
                         $(sDataIdSelektor).html(sInnerHtml);
@@ -97,6 +101,14 @@ $(function() {
 
                         //move and place close-element and text this
                         $('.' + config.closeElement).text(config.closeElementText).prependTo('.' + config.indexContentClass);
+
+                        //add custom css
+                        //@TODO function this
+                        console.log(sDataIdSelektor)
+                        $(sDataIdSelektor).css({
+                            'box-shadow': '0 0 0 ' + insertOptions(sDataId).border_width + 'px rgba(255,255,255,0.5)'
+                        });
+                        $(sDataIdSelektor).find('.' + config.contentOrigin).css('padding',insertOptions(sDataId).padding + 'px');
                     }
                     
                     //show wrapper and this layer
@@ -114,6 +126,24 @@ $(function() {
                 $('.' + config.closeElement).on('click', function() {
                     $(this).parents('.' + config.indexContentClass).add('.' + config.wrapperClass).hide();
                 });
+            };
+
+            /**
+             * read custom options from data attribut and overwrite defaultOptions()
+             */
+            var insertOptions = function(id) {
+                var customData = $('body').find('*[' + config.dataAttrName + '=' + id + ']').data(config.customOptions);
+
+                if (!customData) {
+                    return false;
+                }
+
+                var replaceOptions = $.parseJSON(
+                        '{"' + customData.replace(/=/g,'":"').replace(/,/g,'","').replace(/ /g,'') + '"}'
+                    ),
+                    custom = $.extend({}, defaultOptions, replaceOptions);
+
+                return custom;
             };
 
             /**
