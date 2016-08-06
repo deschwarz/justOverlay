@@ -1,8 +1,8 @@
-.js-init-layer {
+.js-init-jo {
     display: none; //initial verstecken
 }
 
-.layer-wrapper {
+.jo-wrapper {
     display: none;
     position: fixed;
     background: rgba(0,0,0,0.75);
@@ -15,8 +15,8 @@
     left: 0;
 }
 
-/*Basic Styling layer*/
-.layer-wrapper .layer-index {
+/*Basic Styling justOverlay*/
+.jo-wrapper .jo-index {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -28,20 +28,20 @@
     box-shadow: 0px 0px 0px 4px rgba(255,255,255,0.5);
 }
 
-.layer-wrapper .layer-index.layer-scrolling {
+.jo-wrapper .jo-index.jo-scrolling {
     height: 100%;
 }
 
-.layer-wrapper .layer-content {
+.jo-wrapper .jo-content {
     overflow: auto;
     height: 100%;
 }
 
-.layer-wrapper .layer-content .layer-origin {
+.jo-wrapper .jo-content .jo-origin {
     /*padding: 15px;*/
 }
 
-.layer-wrapper .layer-close {
+.jo-wrapper .jo-close {
     position: absolute;
     right: 0;
     top: -1.75em;

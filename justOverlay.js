@@ -1,5 +1,5 @@
 /**
- * layer.js
+ * justOverlay.js
  *
  * A simple layer helper method
  *
@@ -10,12 +10,12 @@ $(function() {
 
         'use strict';
 
-        function Layer() {
+        function justOverlay() {
 
-            var globalName = 'layer';
+            var globalName = 'jo';
 
             var config = {
-                initClass: 'js-init-' + globalName, //inits function of layer
+                initClass: 'js-init-' + globalName, //inits function of justOverlay
                 wrapperClass: globalName + '-wrapper', //needs for toggling show/hide)
                 indexContentClass: globalName + '-index', //needs for Basic-CSS
                 contentClass: globalName + '-content', //place html-content of Layer here
@@ -79,12 +79,12 @@ $(function() {
             var openLayer = function() {
                 $('body').find('*[' + config.dataAttrName +']').on('click', function(e) {
                     e.preventDefault();
-                    var sDataId = $(this).data(globalName), // get layer id
+                    var sDataId = $(this).data(globalName), // get justOverlay id
                         sDataIdSelektor = '#' + sDataId,
-                        sIdentifyClass = globalName + '-' + sDataId, // flag opened Layer (get class from layer id)
+                        sIdentifyClass = globalName + '-' + sDataId, // flag opened Layer (get class from justOverlay id)
                         sInnerHtml = ''
                         
-                    //check layer has opened before
+                    //check justOverlay has opened before
                     if (!$('.' + config.wrapperClass).hasClass(sIdentifyClass)) {
                         
                     sInnerHtml  =   '<div class=' + config.contentClass + '>'
@@ -165,7 +165,7 @@ $(function() {
             }
         };
         
-        Layer();
+        justOverlay();
 
     } (jQuery);
 });
