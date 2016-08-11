@@ -1,27 +1,28 @@
 +function($, undefined) {
-
+console.log(1)
     'use strict';
 
     var Layer = function($Element, oExternalConfig) {
-
+console.log(2)
         var oSelf = this;
 
-        oSelf.sGlobalName = 'jo',
+        oSelf.sGlobalPrefix = 'jo',
 
         oSelf.oConfig = {
             
             oClasses: {
-                initClass: oSelf.sGlobalName + '-init', //inits function of justOverlay
-                wrapperClass: oSelf.sGlobalName + '-wrapper', //needs for toggling show/hide)
-                indexContentClass: oSelf.sGlobalName + '-index', //needs for Basic-CSS
-                contentClass: oSelf.sGlobalName + '-content', //place html-content of Layer here
-                contentOrigin: oSelf.sGlobalName + '-origin',
-                closeElement: oSelf.sGlobalName + '-close',
-                closeElementText: 'X',
-                isScrolling: oSelf.sGlobalName + '-scrolling',
-                dataAttrName: 'data-' + oSelf.sGlobalName,
-                customOptions: oSelf.sGlobalName + '-custom',
-                linkClass: oSelf.sGlobalName + '-open-this'
+                initClass: oSelf.sGlobalPrefix + '-init', //inits function of justOverlay
+                wrapperClass: oSelf.sGlobalPrefix + '-wrapper', //needs for toggling show/hide)
+                indexContentClass: oSelf.sGlobalPrefix + '-index', //needs for Basic-CSS
+                contentClass: oSelf.sGlobalPrefix + '-content', //place html-content of Layer here
+                contentOrigin: oSelf.sGlobalPrefix + '-origin',
+
+                isScrolling: oSelf.sGlobalPrefix + '-scrolling',
+                dataAttrName: 'data-' + oSelf.sGlobalPrefix,
+                customOptions: oSelf.sGlobalPrefix + '-custom',
+                closeElement: oSelf.sGlobalPrefix + '-close',
+                openElement: $Element.attr('id'),
+                closeElementText: 'X'
             },
 
             oOptions: {
@@ -43,44 +44,44 @@
         oSelf.$Element = $Element;
 
         oSelf.init();
-        oSelf.bindEvents();
-
-    };
-
-    Layer.prototype.init = function() {
-       
-        var oSelf = this;
-        oSelf.linkClass();
-        oSelf.buildElement();
-        oSelf.buildMarkup();
-
-    };
-
-    Layer.prototype.bindEvents = function() {
-
-        var oSelf = this;
-
-        $(document).on('click', '.' + oSelf.oConfig.oClasses.linkClass, oSelf, function(e){
-            e.preventDefault();
-            oSelf.openLayer($(this));
-        });
-
-
-
-        $(document).on('click', '.' + oSelf.oConfig.oClasses.closeElement, oSelf, function(){
-            oSelf.closeLayer($(this));
-        });
-
     };
 
     /**
-     * 
+     * @description 
      */
-    Layer.prototype.linkClass = function() {
+    Layer.prototype.init = function() {
+        console.log('init')
         var oSelf = this;
 
-        //build class to all layer links
-        $(document).find('*[' + oSelf.oConfig.oClasses.dataAttrName +']').addClass(oSelf.oConfig.oClasses.linkClass);
+        oSelf.buildElement();
+
+        //on click: open or close layer
+        oSelf.bindEvent('#' + oSelf.oConfig.oClasses.openElement, 'click');
+        $('.' + oSelf.oConfig.oClasses.closeElement).unbind('click'); //before unbind close click
+        oSelf.bindEvent('.' + oSelf.oConfig.oClasses.closeElement, 'click');
+    };
+
+    /**
+     * @description 
+     */
+    Layer.prototype.bindEvent = function(sElement, sEvent) {
+        var oSelf = this;
+        console.log('bindEventsElement',sElement)
+
+        $(sElement).on(sEvent, oSelf, function(e) {
+            console.log('clicked')
+            switch (sElement) {
+                case '#' + oSelf.oConfig.oClasses.openElement:
+                        e.preventDefault();
+                        oSelf.openLayer($(this));
+                    break;
+
+                case '.' + oSelf.oConfig.oClasses.closeElement:
+                    oSelf.closeLayer($(this));
+                    break;
+            }
+        });
+        return oSelf;
     };
 
     /**
@@ -89,8 +90,13 @@
     Layer.prototype.buildElement = function() {
         var oSelf = this;
 
-        oSelf.buildMarkup('div', oSelf.oConfig.oClasses.wrapperClass);
-        oSelf.buildMarkup('div', oSelf.oConfig.oClasses.closeElement);
+        if (!$('.'+oSelf.oConfig.oClasses.wrapperClass).length) {
+            oSelf.buildMarkup('div', oSelf.oConfig.oClasses.wrapperClass);
+        }
+        if (!$('.'+oSelf.oConfig.oClasses.closeElement).length) {
+            oSelf.buildMarkup('div', oSelf.oConfig.oClasses.closeElement); 
+        }
+
     };
 
     /**
@@ -115,44 +121,44 @@
      */
     Layer.prototype.openLayer = function($This) {
         var oSelf = this,
-            sDataId = $This.data(oSelf.sGlobalName), // get layer name (corresponding id)
-            sDataIdSelektor = '#' + sDataId,
-            sIdentifyClass = oSelf.GlobalName + '-' + sDataId, // flag opened Layer (get class from justOverlay id)
+            sDataId = oSelf.$Element.attr('id') // get layer id (for corresponding layer template data-jo-id)
+            $LayerContent = $('body').find('[data-jo-id=' + sDataId + ']'),
+            sIdentifyClass = oSelf.sGlobalPrefix + '-' + sDataId, // flag opened Layer in wrapper (get class from id)
             sInnerHtml = '',
             sWrapperClass = '.' + oSelf.oConfig.oClasses.wrapperClass;
 
-        //check justOverlay has opened before
+        //check layer has opened before
         if (!$(sWrapperClass).hasClass(sIdentifyClass)) {
             
             sInnerHtml  =   '<div class=' + oSelf.oConfig.oClasses.contentClass + '>'
                         +       '<div class=' + oSelf.oConfig.oClasses.contentOrigin + '>' 
-                        +       $(sDataIdSelektor).html()
+                        +       $LayerContent.html()
                         +       '</div>' 
                         +   '</div>'
 
             //wrap users layer-content into divs
-            $(sDataIdSelektor).html(sInnerHtml);
+            $LayerContent.html(sInnerHtml);
 
             //move users layer-content to layer wrapper and add index-content class
-            $(sDataIdSelektor).addClass(oSelf.oConfig.oClasses.indexContentClass).appendTo(sWrapperClass);
+            $LayerContent.addClass(oSelf.oConfig.oClasses.indexContentClass).appendTo(sWrapperClass);
 
             //move and place close-element and text this
             $('.' + oSelf.oConfig.oClasses.closeElement).text(oSelf.oConfig.oClasses.closeElementText).prependTo('.' + oSelf.oConfig.oClasses.indexContentClass);
 
             //add custom css
             //@TODO function this
-            console.log('sDataIdSelektor:',sDataIdSelektor)
-            $(sDataIdSelektor).css({
+            console.log('$LayerContent:',$LayerContent)
+            $LayerContent.css({
                 'box-shadow': '0 0 0 ' + oSelf.insertOptions($This).border_width + 'px rgba(255,255,255,0.5)'
             });
-            $(sDataIdSelektor).find('.' + oSelf.oConfig.oClasses.contentOrigin).css('padding',oSelf.insertOptions($This).padding + 'px');
+            $LayerContent.find('.' + oSelf.oConfig.oClasses.contentOrigin).css('padding',oSelf.insertOptions($This).padding + 'px');
         }
         
         //show wrapper and this layer
-        $(sWrapperClass).addClass(sIdentifyClass).add(sDataIdSelektor).show();
+        $(sWrapperClass).addClass(sIdentifyClass).add($LayerContent).show();
 
-        oSelf.hasScrollContent(sDataIdSelektor);
-        
+        oSelf.hasScrollContent($LayerContent);
+
     };
 
     /**
@@ -193,7 +199,7 @@
     };
 
     function JustOverlay(oConfig) {
-        
+        console.log(3)
         // var $Self = $(this);
 
         // // get the data which is maybe bound to .data('aidu.javascriptclass');
@@ -207,9 +213,14 @@
         //         Layer($Self, oConfig)));
         // }
 
+        return this.each(function() {
+            var $Self = $(this);
 
-        var layer = new Layer();
-
+            if ($Self.attr('id')) {
+                var layer = new Layer($Self);
+            }
+        
+        });
     }
 
 
