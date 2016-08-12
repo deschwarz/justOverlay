@@ -1,4 +1,4 @@
 $(function() {
 
-    $('#hier, #dort').justOverlay();
+    $('#hier, #dort, #text-info').justOverlay();
 });

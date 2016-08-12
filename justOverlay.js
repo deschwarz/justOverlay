@@ -3,7 +3,7 @@ console.log(1)
     'use strict';
 
     var Layer = function($Element, oExternalConfig) {
-console.log(2)
+
         var oSelf = this;
 
         oSelf.sGlobalPrefix = 'jo',
@@ -13,12 +13,11 @@ console.log(2)
             oClasses: {
                 initClass: oSelf.sGlobalPrefix + '-init', //inits function of justOverlay
                 wrapperClass: oSelf.sGlobalPrefix + '-wrapper', //needs for toggling show/hide)
-                indexContentClass: oSelf.sGlobalPrefix + '-index', //needs for Basic-CSS
+                indexClass: oSelf.sGlobalPrefix + '-index', //needs for Basic-CSS
                 contentClass: oSelf.sGlobalPrefix + '-content', //place html-content of Layer here
                 contentOrigin: oSelf.sGlobalPrefix + '-origin',
-
                 isScrolling: oSelf.sGlobalPrefix + '-scrolling',
-                dataAttrName: 'data-' + oSelf.sGlobalPrefix,
+                dataLayerId: 'data-' + oSelf.sGlobalPrefix + '-id',
                 customOptions: oSelf.sGlobalPrefix + '-custom',
                 closeElement: oSelf.sGlobalPrefix + '-close',
                 openElement: $Element.attr('id'),
@@ -50,26 +49,31 @@ console.log(2)
      * @description 
      */
     Layer.prototype.init = function() {
-        console.log('init')
+
         var oSelf = this;
 
-        oSelf.buildElement();
+        //build main wrapper
+        if (!$('.'+oSelf.oConfig.oClasses.wrapperClass).length) {
+            oSelf.buildMarkup('div', oSelf.oConfig.oClasses.wrapperClass, $('body'));
+        }
 
         //on click: open or close layer
         oSelf.bindEvent('#' + oSelf.oConfig.oClasses.openElement, 'click');
-        $('.' + oSelf.oConfig.oClasses.closeElement).unbind('click'); //before unbind close click
+        $('.' + oSelf.oConfig.oClasses.closeElement).unbind('click'); //before unbind event close
         oSelf.bindEvent('.' + oSelf.oConfig.oClasses.closeElement, 'click');
+
     };
 
     /**
      * @description 
      */
     Layer.prototype.bindEvent = function(sElement, sEvent) {
-        var oSelf = this;
-        console.log('bindEventsElement',sElement)
 
-        $(sElement).on(sEvent, oSelf, function(e) {
+        var oSelf = this;
+
+        $(document.body).on(sEvent, sElement, function(e) {
             console.log('clicked')
+
             switch (sElement) {
                 case '#' + oSelf.oConfig.oClasses.openElement:
                         e.preventDefault();
@@ -81,39 +85,17 @@ console.log(2)
                     break;
             }
         });
-        return oSelf;
-    };
-
-    /**
-     * 
-     */
-    Layer.prototype.buildElement = function() {
-        var oSelf = this;
-
-        if (!$('.'+oSelf.oConfig.oClasses.wrapperClass).length) {
-            oSelf.buildMarkup('div', oSelf.oConfig.oClasses.wrapperClass);
-        }
-        if (!$('.'+oSelf.oConfig.oClasses.closeElement).length) {
-            oSelf.buildMarkup('div', oSelf.oConfig.oClasses.closeElement); 
-        }
-
+        // return oSelf;
     };
 
     /**
      * position wrapper to start of body 
      * and other builded element as child of wrapper
      */
-    Layer.prototype.buildMarkup = function(sElement, sClassName) {
-        var oSelf = this,
-            oElement = document.createElement(sElement),
-            sParent = '.' + oSelf.oConfig.oClasses.wrapperClass;  
-
+    Layer.prototype.buildMarkup = function(sElement, sClassName, $PrependParent) {
+        var oElement = document.createElement(sElement);
         oElement.className = sClassName; // name class
-
-        if ($(oElement).hasClass(oSelf.oConfig.oClasses.wrapperClass)) {
-            sParent = 'body';
-        }
-        $(sParent).prepend(oElement);
+        $PrependParent.prepend(oElement);
     };
 
     /**
@@ -122,8 +104,8 @@ console.log(2)
     Layer.prototype.openLayer = function($This) {
         var oSelf = this,
             sDataId = oSelf.$Element.attr('id') // get layer id (for corresponding layer template data-jo-id)
-            $LayerContent = $('body').find('[data-jo-id=' + sDataId + ']'),
-            sIdentifyClass = oSelf.sGlobalPrefix + '-' + sDataId, // flag opened Layer in wrapper (get class from id)
+            $LayerContent = $('body').find('[' + oSelf.oConfig.oClasses.dataLayerId + '~=' + sDataId + ']'),
+            sIdentifyClass = oSelf.sGlobalPrefix + '-generated-' + sDataId, // flag opened Layer in wrapper (get class from id)
             sInnerHtml = '',
             sWrapperClass = '.' + oSelf.oConfig.oClasses.wrapperClass;
 
@@ -140,14 +122,15 @@ console.log(2)
             $LayerContent.html(sInnerHtml);
 
             //move users layer-content to layer wrapper and add index-content class
-            $LayerContent.addClass(oSelf.oConfig.oClasses.indexContentClass).appendTo(sWrapperClass);
+            $LayerContent.addClass(oSelf.oConfig.oClasses.indexClass).appendTo(sWrapperClass);
 
-            //move and place close-element and text this
-            $('.' + oSelf.oConfig.oClasses.closeElement).text(oSelf.oConfig.oClasses.closeElementText).prependTo('.' + oSelf.oConfig.oClasses.indexContentClass);
+            //build close-element and text this
+            oSelf.buildMarkup('div', oSelf.oConfig.oClasses.closeElement, $LayerContent); 
+            $('.' + oSelf.oConfig.oClasses.closeElement).text(oSelf.oConfig.oClasses.closeElementText);
 
             //add custom css
             //@TODO function this
-            console.log('$LayerContent:',$LayerContent)
+
             $LayerContent.css({
                 'box-shadow': '0 0 0 ' + oSelf.insertOptions($This).border_width + 'px rgba(255,255,255,0.5)'
             });
@@ -166,7 +149,7 @@ console.log(2)
      */
     Layer.prototype.closeLayer = function($This) {
         var oSelf = this;
-        $This.parents('.' + oSelf.oConfig.oClasses.indexContentClass).add('.' + oSelf.oConfig.oClasses.wrapperClass).hide();
+        $This.parents('.' + oSelf.oConfig.oClasses.indexClass).add('.' + oSelf.oConfig.oClasses.wrapperClass).hide();
     };
 
 
@@ -199,7 +182,7 @@ console.log(2)
     };
 
     function JustOverlay(oConfig) {
-        console.log(3)
+
         // var $Self = $(this);
 
         // // get the data which is maybe bound to .data('aidu.javascriptclass');
@@ -215,12 +198,13 @@ console.log(2)
 
         return this.each(function() {
             var $Self = $(this);
-
-            if ($Self.attr('id')) {
+            sThisId = $Self.attr('id');
+            
+            if (sThisId) {
                 var layer = new Layer($Self);
             }
-        
         });
+
     }
 
 
