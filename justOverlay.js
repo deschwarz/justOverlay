@@ -1,7 +1,15 @@
 +function($, undefined) {
 console.log(1)
+
     'use strict';
 
+    /**
+     * { function_description }
+     *
+     * @class      Layer (name)
+     * @param      {<type>}  $Element         The element
+     * @param      {<type>}  oExternalConfig  The o external configuration
+     */
     var Layer = function($Element, oExternalConfig) {
 
         var oSelf = this;
@@ -20,7 +28,7 @@ console.log(1)
                 dataLayerId: 'data-' + oSelf.sGlobalPrefix + '-id',
                 customOptions: oSelf.sGlobalPrefix + '-custom',
                 closeElement: oSelf.sGlobalPrefix + '-close',
-                openElement: $Element.attr('id'),
+                // openElement: $Element.attr('id'),
                 closeElementText: 'X'
             },
 
@@ -46,7 +54,7 @@ console.log(1)
     };
 
     /**
-     * @description 
+     * { function_description }
      */
     Layer.prototype.init = function() {
 
@@ -57,25 +65,27 @@ console.log(1)
             oSelf.buildMarkup('div', oSelf.oConfig.oClasses.wrapperClass, $('body'));
         }
 
-        //on click: open or close layer
-        oSelf.bindEvent('#' + oSelf.oConfig.oClasses.openElement, 'click');
-        $('.' + oSelf.oConfig.oClasses.closeElement).unbind('click'); //before unbind event close
-        oSelf.bindEvent('.' + oSelf.oConfig.oClasses.closeElement, 'click');
+        //on click: open layer
+        oSelf.bindEvent(oSelf.$Element, 'click');
+
 
     };
 
     /**
-     * @description 
-     */
+    * { function_description }
+    *
+    * @param      {<type>}  sElement  The s element
+    * @param      {<type>}  sEvent    The s event
+    */
     Layer.prototype.bindEvent = function(sElement, sEvent) {
 
         var oSelf = this;
 
-        $(document.body).on(sEvent, sElement, function(e) {
+        $(sElement).on(sEvent,  function(e) {
             console.log('clicked')
 
             switch (sElement) {
-                case '#' + oSelf.oConfig.oClasses.openElement:
+                case oSelf.$Element:
                         e.preventDefault();
                         oSelf.openLayer($(this));
                     break;
@@ -89,18 +99,25 @@ console.log(1)
     };
 
     /**
-     * position wrapper to start of body 
-     * and other builded element as child of wrapper
-     */
+    * Builds a markup.
+    * position wrapper to start of body 
+    * and other builded element as child of wrapper
+    *
+    * @param      {<type>}  sElement        The s element
+    * @param      {<type>}  sClassName      The s class name
+    * @param      {<type>}  $PrependParent  The prepend parent
+    */
     Layer.prototype.buildMarkup = function(sElement, sClassName, $PrependParent) {
         var oElement = document.createElement(sElement);
         oElement.className = sClassName; // name class
         $PrependParent.prepend(oElement);
     };
 
-    /**
-     * 
-     */
+     /**
+      * Opens a layer.
+      *
+      * @param      {<type>}  $This   The this
+      */
     Layer.prototype.openLayer = function($This) {
         var oSelf = this,
             sDataId = oSelf.$Element.attr('id') // get layer id (for corresponding layer template data-jo-id)
@@ -142,20 +159,28 @@ console.log(1)
 
         oSelf.hasScrollContent($LayerContent);
 
+        //on click: close layer
+        $('.' + oSelf.oConfig.oClasses.closeElement).unbind('click'); //before unbind event close
+        oSelf.bindEvent('.' + oSelf.oConfig.oClasses.closeElement, 'click');
+
     };
 
-    /**
-     * 
-     */
+     /**
+      * Closes a layer.
+      *
+      * @param      {<type>}  $This   The this
+      */
     Layer.prototype.closeLayer = function($This) {
         var oSelf = this;
         $This.parents('.' + oSelf.oConfig.oClasses.indexClass).add('.' + oSelf.oConfig.oClasses.wrapperClass).hide();
     };
 
-
-    /**
-     * read custom options from data attribut and overwrite oOptions
-     */
+     /**
+      * read custom options from data attribut and overwrite oOptions
+      *
+      * @param      {<type>}   $This   The this
+      * @return     {boolean}  { description_of_the_return_value }
+      */
     Layer.prototype.insertOptions = function($This) {
         var oSelf = this,
             customData = $This.data(oSelf.oConfig.oClasses.customOptions);
@@ -172,8 +197,12 @@ console.log(1)
     };
 
     /**
-    * fires scroll class to avoid overflow
-    */
+     * Determines if it has scroll content.
+     * fires scroll class to avoid overflow
+     *
+     * @param      {<type>}  elementId  The element identifier
+     */
+
     Layer.prototype.hasScrollContent = function(elementId) {
         var oSelf = this;
         if($(elementId).children('.' + oSelf.oConfig.oClasses.contentClass).outerHeight(true) > $(elementId).outerHeight(true)) {
@@ -181,6 +210,13 @@ console.log(1)
         }
     };
 
+    /**
+     * { function_description }
+     *
+     * @class      JustOverlay (name)
+     * @param      {<type>}  oConfig  The o configuration
+     * @return     {<type>}  { description_of_the_return_value }
+     */
     function JustOverlay(oConfig) {
 
         // var $Self = $(this);
