@@ -13,7 +13,7 @@
 
         var oSelf = this;
 
-        oSelf.sGlobalPrefix = 'jo',
+        oSelf.sGlobalPrefix = 'jo';
 
         oSelf.oClasses = {
             
@@ -29,7 +29,7 @@
             closeElement: oSelf.sGlobalPrefix + '-close',
             // openElement: $Element.attr('id'),
             closeElementText: 'X'
-        },
+        };
 
         oSelf.oOptions = {
             styleClass: '',
@@ -39,9 +39,7 @@
             padding: '10',
             backgroundOpacity: '75',
             borderWidth: '2'
-        }
-
-       
+        };
 
         // extend default config with js init object
         $.extend(oSelf.oOptions, oExternalConfig);
@@ -136,7 +134,7 @@
 
             sInnerHtml  =   '<div class=' + oSelf.oClasses.contentClass + '>'
                         +       '<div class=' + oSelf.oClasses.contentOrigin + '>' 
-                        +       $LayerContent.html()
+                        +           $LayerContent.html()
                         +       '</div>' 
                         +   '</div>'
 
@@ -146,9 +144,12 @@
             //move users layer-content to layer wrapper and add index-content class
             $LayerContent.addClass(oSelf.oClasses.indexClass).appendTo(sWrapperClass);
             //build close-element and text this
-            oSelf.buildMarkup('div', oSelf.oClasses.closeElement, $LayerContent); 
-
-            $LayerContent.children('.' + oSelf.oClasses.closeElement).text(oSelf.oClasses.closeElementText);
+            oSelf.buildMarkup(
+                'div', 
+                oSelf.oClasses.closeElement,
+                $LayerContent.children('.' + oSelf.oClasses.contentClass)
+            ); 
+            $LayerContent.find('.' + oSelf.oClasses.closeElement).text(oSelf.oClasses.closeElementText);
         }
         
         oSelf.customOptions($This, $LayerContent);
@@ -180,7 +181,7 @@
       * @return     {boolean}  { description_of_the_return_value }
       */
     Layer.prototype.customOptions = function($This,$LayerContent) {
-        console.log($LayerContent)
+        //console.log($LayerContent)
         var oSelf = this,
             sCustomData = $This.data(oSelf.oClasses.customOptions),
             replaceOptions = {};
