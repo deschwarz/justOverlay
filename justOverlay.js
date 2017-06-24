@@ -114,6 +114,20 @@
         $PrependParent.prepend(oElement);
     };
 
+
+     /**
+      * find reference Layer.
+      *
+      * @param      {<type>}  id 
+      * @return     {$ Object}  { layer Element }
+      */
+    Layer.prototype.findReferenceLayer = function(sId) {
+        var oSelf = this,
+            sThisId = sId,
+            $ReferenceLayer = $('body').find('[' + oSelf.oClasses.dataLayerId + '~=' + sThisId + ']');
+        return $ReferenceLayer;
+    };
+
      /**
       * Opens a layer.
       *
@@ -122,7 +136,7 @@
     Layer.prototype.openLayer = function($This) {
         var oSelf = this,
             sDataId = oSelf.$Element.attr('id'), // get layer id (for corresponding layer template data-jo-id)
-            $LayerContent = $('body').find('[' + oSelf.oClasses.dataLayerId + '~=' + sDataId + ']'),
+            $LayerContent = oSelf.findReferenceLayer(sDataId),
             // flag opened Layer in wrapper (get class from id)
             sIdentifyClass = oSelf.sGlobalPrefix + '-generated-' + $LayerContent.attr(oSelf.oClasses.dataLayerId).replace(/ /g,''), 
 
@@ -152,7 +166,7 @@
             $LayerContent.find('.' + oSelf.oClasses.closeElement).text(oSelf.oClasses.closeElementText);
         }
         
-        oSelf.customOptions($This, $LayerContent);
+        oSelf.customOptions($This);
 
         //show wrapper and this layer
         $(sWrapperClass).addClass(sIdentifyClass).add($LayerContent).show();
@@ -180,20 +194,17 @@
       * @param      {<type>}   $This   The this
       * @return     {boolean}  { description_of_the_return_value }
       */
-    Layer.prototype.customOptions = function($This,$LayerContent) {
-        //console.log($LayerContent)
+    Layer.prototype.customOptions = function($This) {
         var oSelf = this,
             sCustomData = $This.data(oSelf.oClasses.customOptions),
-            replaceOptions = {};
-            
-        // oSelf.oOptions = oSelf.oOptions;  
+            replaceOptions = {},
+            $LayerContent = oSelf.findReferenceLayer($This.attr('id'));
+ 
         if (sCustomData) {
-
-        replaceOptions = $.parseJSON(
-            '{"' + sCustomData.replace(/=/g,'":"').replace(/,/g,'","').replace(/ /g,'') + '"}'
-        );
-
-        oSelf.oOptions = $.extend({}, oSelf.oOptions, replaceOptions);
+            replaceOptions = $.parseJSON(
+                '{"' + sCustomData.replace(/=/g,'":"').replace(/,/g,'","').replace(/ /g,'') + '"}'
+            );
+            oSelf.oOptions = $.extend({}, oSelf.oOptions, replaceOptions);
         }
 
         /**
@@ -264,7 +275,7 @@
                 sThisId = $Self.attr('id');
             
             if (sThisId) {
-                var layer = new Layer($Self);
+                var layer = new Layer($Self, oConfig);
             }
         });
 
