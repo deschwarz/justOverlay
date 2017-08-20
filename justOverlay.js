@@ -3,11 +3,11 @@
     'use strict';
 
     /**
-     * { function_description }
+     * { Layer function }
      *
      * @class      Layer (name)
-     * @param      {<type>}  $Element         The element
-     * @param      {<type>}  oExternalConfig  The o external configuration
+     * @param      {$ object}  $Element       The element
+     * @param      {object}  oExternalConfig  The external configuration
      */
     var Layer = function($Element, oExternalConfig) {
 
@@ -27,7 +27,6 @@
             dataLayerId: 'data-' + oSelf.sGlobalPrefix + '-id',
             customOptions: oSelf.sGlobalPrefix + '-custom',
             closeElement: oSelf.sGlobalPrefix + '-close',
-            // openElement: $Element.attr('id'),
             closeElementText: 'X'
         };
 
@@ -35,7 +34,7 @@
             styleClass: '',
             close: 'button', //button, overlay
             
-            //Style
+            //basic Style
             padding: '10',
             backgroundOpacity: '75',
             borderWidth: '2'
@@ -51,7 +50,7 @@
     };
 
     /**
-     * { function_description }
+     * { init function }
      */
     Layer.prototype.init = function() {
 
@@ -69,10 +68,10 @@
     };
 
     /**
-    * { function_description }
+    * { bind events }
     *
-    * @param      {<type>}  sElement  The s element
-    * @param      {<type>}  sEvent    The s event
+    * @param      {string}  sElement  The element
+    * @param      {string}  sEvent    The event
     */
     Layer.prototype.bindEvent = function(sElement, sEvent) {
 
@@ -96,7 +95,6 @@
                     }
             }
         });
-        // return oSelf;
     };
 
     /**
@@ -104,9 +102,9 @@
     * position wrapper to start of body 
     * and other builded element as child of wrapper
     *
-    * @param      {<type>}  sElement        The s element
-    * @param      {<type>}  sClassName      The s class name
-    * @param      {<type>}  $PrependParent  The prepend parent
+    * @param      {string}  sElement        The element
+    * @param      {string}  sClassName      The class name
+    * @param      {$ object}  $PrependParent  The prepend parent
     */
     Layer.prototype.buildMarkup = function(sElement, sClassName, $PrependParent) {
         var oElement = document.createElement(sElement);
@@ -118,7 +116,7 @@
      /**
       * find reference Layer.
       *
-      * @param      {<type>}  id 
+      * @param      {string}  id 
       * @return     {$ Object}  { layer Element }
       */
     Layer.prototype.findReferenceLayer = function(sId) {
@@ -131,7 +129,7 @@
      /**
       * Opens a layer.
       *
-      * @param      {<type>}  $This   The this
+      * @param {$ Object}  $This The this
       */
     Layer.prototype.openLayer = function($This) {
         var oSelf = this,
@@ -139,7 +137,6 @@
             $LayerContent = oSelf.findReferenceLayer(sDataId),
             // flag opened Layer in wrapper (get class from id)
             sIdentifyClass = oSelf.sGlobalPrefix + '-generated-' + $LayerContent.attr(oSelf.oClasses.dataLayerId).replace(/ /g,''), 
-
             sInnerHtml = '',
             sWrapperClass = '.' + oSelf.oClasses.wrapperClass;
 
@@ -180,8 +177,6 @@
 
      /**
       * Closes a layer.
-      *
-      * @param      {<type>}  $This   The this
       */
     Layer.prototype.closeLayer = function() {
         var oSelf = this;
@@ -191,8 +186,8 @@
      /**
       * read custom options from data attribut and overwrite oOptions
       *
-      * @param      {<type>}   $This   The this
-      * @return     {boolean}  { description_of_the_return_value }
+      * @param      {$ object}   $This   The this
+      * @return     {boolean} 
       */
     Layer.prototype.customOptions = function($This) {
         var oSelf = this,
@@ -208,7 +203,7 @@
         }
 
         /**
-         * add custom options
+         * add basic options
          */
         //element index replace border Width
         $LayerContent.css({
@@ -217,7 +212,7 @@
 
         //element origin replace padding 
         $LayerContent.find('.' + oSelf.oClasses.contentOrigin).css('padding',oSelf.oOptions.padding + 'px');
-        
+
         //element wrapper replace background opacity
         $('.' + oSelf.oClasses.wrapperClass).css('background','rgba(0, 0, 0,' + oSelf.oOptions.backgroundOpacity/100 + ')');
 
@@ -227,7 +222,7 @@
         } else {
             $('.' + oSelf.oClasses.wrapperClass).unbind('click');
         }
-
+        
         //element index get custom class
          if(oSelf.oOptions.styleClass) {
             $LayerContent.addClass(oSelf.oOptions.styleClass);
@@ -244,7 +239,7 @@
      */
     Layer.prototype.hasScrollContent = function(elementId) {
         var oSelf = this;
-        if($(elementId).children('.' + oSelf.oClasses.contentClass).outerHeight(true) > $(elementId).outerHeight(true)) {
+        if ($(elementId).children('.' + oSelf.oClasses.contentClass).outerHeight(true) > $(elementId).outerHeight(true)) {
             $(elementId).addClass(oSelf.oClasses.isScrolling);
         }
     };
@@ -253,22 +248,10 @@
      * { function_description }
      *
      * @class      JustOverlay (name)
-     * @param      {<type>}  oConfig  The o configuration
+     * @param      {object}  oConfig  The configuration
      * @return     {<type>}  { description_of_the_return_value }
      */
     function JustOverlay(oConfig) {
-        // var $Self = $(this);
-
-        // // get the data which is maybe bound to .data('aidu.javascriptclass');
-        // var oData = $Self.data('aidu.javascriptclass');
-
-        // if (!oData) {
-
-        //      so we create a new instance of JavaScriptClass
-        //     * and bind the object to .data('aidu.javascriptclass') 
-        //     $Self.data('aidu.javascriptclass', (oData = new
-        //         Layer($Self, oConfig)));
-        // }
 
         return this.each(function() {
             var $Self = $(this),
@@ -278,7 +261,6 @@
                 var layer = new Layer($Self, oConfig);
             }
         });
-
     }
 
     /**
